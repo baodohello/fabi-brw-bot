@@ -103,7 +103,7 @@ def run_fabi_agent_with_session(store_uid, new_bank_acc, new_acc_name="DO TUAN B
         page.goto(target_url)
         
         try:
-            page.wait_for_selector("input[placeholder='Nhập số tài khoản']", timeout=60)
+            page.wait_for_selector("input[placeholder='Nhập số tài khoản']", timeout=6000)
             
             logger.log(f"Đang ghi đè Số tài khoản mới: {new_bank_acc}", "info")
             stk_field = page.locator("input[placeholder='Nhập số tài khoản']")
@@ -166,7 +166,7 @@ if __name__ == "__main__":
         STK_MUC_TIEU = account_target["stk"]
         TEN_MUC_TIEU = account_target["ten"]
 
-        logger.log(f"🎯 Tài khoản cần cài đặt: {STK_MUC_TIEU} ({TEN_MUC_TIEU})", "info")
+        logger.log(f"🎯 Tài khoản cần cài đặt: ********{STK_MUC_TIEU[-4:]} ({TEN_MUC_TIEU})", "info")
 
         # --- LUỒNG PHỐI HỢP CHECK & UPDATE CHO TỪNG QUÁN ---
         info_truoc = None
@@ -184,7 +184,7 @@ if __name__ == "__main__":
             break
 
         if info_truoc and isinstance(info_truoc, dict):
-            logger.log(f"Số TK hiện tại trên iPOS: {info_truoc['bank_acc']} ({info_truoc['bank_acc_name']})", "info")
+            logger.log(f"Số TK hiện tại trên iPOS: ********{info_truoc['bank_acc'][-4:]} ({info_truoc['bank_acc_name']})", "info")
             
             if info_truoc["bank_acc"] == STK_MUC_TIEU and info_truoc["bank_acc_name"] == TEN_MUC_TIEU:
                 logger.log(f"✅ Kết quả: {store_name} đã đúng số tài khoản. Bỏ qua bước cập nhật.", "success")
@@ -202,8 +202,8 @@ if __name__ == "__main__":
                         summary_msg = (
                             f"📊 **BÁO CÁO CẬP NHẬT: {store_name}**\n"
                             f"• Mốc giờ: `{selected_slot}`\n"
-                            f"• Trước khi chạy: `{info_truoc['bank_acc']}`\n"
-                            f"• Thực tế hiện tại: `{info_sau['bank_acc']}`\n"
+                            f"• Trước khi chạy: `********{info_truoc['bank_acc'][-4:]}`\n"
+                            f"• Thực tế hiện tại: ``********{info_sau['bank_acc'][-4:]}`\n"
                             f"• Chủ tài khoản: `{info_sau['bank_acc_name']}`"
                         )
                         
