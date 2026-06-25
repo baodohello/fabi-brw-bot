@@ -1,6 +1,6 @@
 import os
 import time
-import sys
+
 from datetime import datetime
 from playwright.sync_api import sync_playwright
 from dotenv import load_dotenv
