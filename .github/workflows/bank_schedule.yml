@@ -2,6 +2,8 @@
 name: Run FABI BRW Bank Sync Bot
 
 on:
+  push:
+    branches: [ main ]
   schedule:
     - cron: '0 23 * * *'    # Chạy lúc 6:00 AM giờ Việt Nam
     - cron: '30 1 * * *'    # Chạy lúc 8:30 AM giờ Việt Nam
