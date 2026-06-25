@@ -13,28 +13,36 @@ on:
 
 jobs:
   run-fabi-bot:
-    runs-on: ubuntu-latest 
-    
-    # 🐳 Chạy trên môi trường Docker của chính Playwright
-    container:
-      image: mcr.microsoft.com/playwright:v1.44.0-jammy
+    # 🍏 CHUYỂN SANG CHẠY TRÊN MÁY ẢO MACOS
+    runs-on: macos-latest 
 
     steps:
-    # Bước 1: Kéo toàn bộ code từ kho lưu trữ GitHub của anh vào môi trường Docker
+    # Bước 1: Kéo code từ kho lưu trữ GitHub vào máy ảo Mac
     - name: Checkout repository code
       uses: actions/checkout@v4
 
-    # Bước 2: Cài đặt và sử dụng lệnh pip3 chuẩn xác cho hệ thống
-    - name: Install dependencies
-      run: |
-        sudo apt-get update && sudo apt-get install -y python3-pip
-        pip3 install --upgrade pip
-        if [ -f requirements.txt ]; then pip3 install -r requirements.txt; else pip3 install playwright requests python-dotenv; fi
+    # Bước 2: Cài đặt môi trường Python 3.11 (macOS hỗ trợ cực tốt, có sẵn pip chuẩn)
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        cache: 'pip'
 
-    # Bước 3: Kích hoạt chạy con bot mã nguồn của anh
+    # Bước 3: Cài đặt các thư viện cần thiết từ file requirements.txt
+    - name: Install Python dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install playwright requests python-dotenv; fi
+
+    # Bước 4: Tải trình duyệt Chromium thuần túy (Trên Mac lệnh này chạy phát ăn ngay, không lo lỗi thư viện)
+    - name: Install Playwright Chromium Browser
+      run: |
+        python -m playwright install chromium
+
+    # Bước 5: Kích hoạt chạy con bot mã nguồn của anh
     - name: Execute Bank Switcher Task
       env:
         FABI_USERNAME: '${{ secrets.FABI_USERNAME }}'
         FABI_PASSWORD: '${{ secrets.FABI_PASSWORD }}'
         DISCORD_WEBHOOK_URL: '${{ secrets.DISCORD_WEBHOOK_URL }}'
-      run: python3 -m tasks.bank_switcher
+      run: python -m tasks.bank_switcher
