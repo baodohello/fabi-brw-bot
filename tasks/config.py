@@ -30,7 +30,3 @@ STORES_CONFIG = {
     }
 }
 
-def get_current_vn_time_str():
-    """Hàm bổ trợ lấy giờ hiện tại theo định dạng HH:MM chuẩn múi giờ Việt Nam."""
-    now_vn = datetime.now(VN_TZ)
-    return now_vn.strftime("%H:%M")

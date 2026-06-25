@@ -5,7 +5,7 @@ from datetime import datetime
 from playwright.sync_api import sync_playwright
 from dotenv import load_dotenv
 # Import cấu hình và hàm lấy giờ VN từ file config.py vừa tạo
-from config import STORES_CONFIG,VN_TZ, get_current_vn_time_str
+from config import STORES_CONFIG,VN_TZ
 
 # IMPORT MODULE DISCORD VỪA TẠO
 from modules.discord_logger import DiscordLogger
