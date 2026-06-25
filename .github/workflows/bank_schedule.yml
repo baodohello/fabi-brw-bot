@@ -5,11 +5,11 @@ on:
   push:
     branches: [ main ]
   schedule:
-    - cron: '0 23 * * *'    # Chạy lúc 6:00 AM giờ Việt Nam
-    - cron: '30 1 * * *'    # Chạy lúc 8:30 AM giờ Việt Nam
-    - cron: '30 4 * * *'    # Chạy lúc 11:30 AM giờ Việt Nam
-    - cron: '30 6 * * *'    # Chạy lúc 1:30 PM giờ Việt Nam
-    - cron: '20 17 * * *'    # Chạy lúc 4:30 PM giờ Việt Nam
+    - cron: '0 23 * * *'  # Chạy lúc 06:00 VN
+    - cron: '30 1 * * *'  # Chạy lúc 08:30 VN
+    - cron: '30 4 * * *'  # Chạy lúc 11:30 VN
+    - cron: '30 6 * * *'  # Chạy lúc 13:30 VN
+    - cron: '30 9 * * *'  # Chạy lúc 16:30 VN
 
   workflow_dispatch: # Bấm nút chạy thử bằng tay trên giao diện web GitHub
 
