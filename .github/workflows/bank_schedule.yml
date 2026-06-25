@@ -39,16 +39,18 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install playwright requests python-dotenv; fi
 
-    # Bước 4: Cài đặt trình duyệt Chromium (Chrome ngầm) và các thư viện hệ thống đi kèm của Linux
+    # Bước 4: Cập nhật chỉ mục thư viện hệ thống và Cài đặt trình duyệt Chromium cùng các phần phụ thuộc
     - name: Install Playwright Browsers and OS Dependencies
-      run: playwright install chromium --with-deps
+      run: |
+        sudo apt-get update
+        playwright install chromium --with-deps
 
     # Bước 5: Kích hoạt chạy con bot mã nguồn của anh
     - name: Execute Bank Switcher Task
       env:
-        # Lấy các mật khẩu bí mật đã cấu hình trong mục "GitHub Secrets" và nạp vào biến môi trường hệ thống
-        FABI_USERNAME: ${{ secrets.FABI_USERNAME }}
-        FABI_PASSWORD: ${{ secrets.FABI_PASSWORD }}
-        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        # Bọc dấu nháy đơn để bảo vệ chuỗi nếu mật khẩu/webhook chứa ký tự đặc biệt ($, !, &)
+        FABI_USERNAME: '${{ secrets.FABI_USERNAME }}'
+        FABI_PASSWORD: '${{ secrets.FABI_PASSWORD }}'
+        DISCORD_WEBHOOK_URL: '${{ secrets.DISCORD_WEBHOOK_URL }}'
       # Chạy script Python theo dạng Module từ thư mục gốc
       run: python -m tasks.bank_switcher
