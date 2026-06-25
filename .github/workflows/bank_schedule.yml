@@ -24,14 +24,14 @@ jobs:
     - name: Checkout repository code
       uses: actions/checkout@v4
 
-    # Bước 2: Cài đặt pip cho Linux và nạp các thư viện Python cần thiết
+    # Bước 2: Cài đặt và sử dụng lệnh pip3 chuẩn xác cho hệ thống
     - name: Install dependencies
       run: |
         sudo apt-get update && sudo apt-get install -y python3-pip
-        python3 -m pip install --upgrade pip
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install playwright requests python-dotenv; fi
+        pip3 install --upgrade pip
+        if [ -f requirements.txt ]; then pip3 install -r requirements.txt; else pip3 install playwright requests python-dotenv; fi
 
-    # Bước 3: Kích hoạt chạy con bot mã nguồn của anh luôn
+    # Bước 3: Kích hoạt chạy con bot mã nguồn của anh
     - name: Execute Bank Switcher Task
       env:
         FABI_USERNAME: '${{ secrets.FABI_USERNAME }}'
