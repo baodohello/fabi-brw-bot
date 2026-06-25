@@ -45,5 +45,5 @@ jobs:
         FABI_USERNAME: ${{ secrets.FABI_USERNAME }}
         FABI_PASSWORD: ${{ secrets.FABI_PASSWORD }}
         DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-        STORES_CONFIG_JSON: ${{ secrets.STORES_CONFIG_JSON }}
+        STORES_CONFIG_JSON: ${{ vars.STORES_CONFIG_JSON }}
       run: python -m tasks.bank_switcher
