@@ -39,10 +39,15 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install playwright requests python-dotenv; fi
 
-    # Bước 4: Sử dụng lệnh hệ thống của chính playwright để tự động xử lý các gói phụ thuộc
+    # Bước 4: Ép hệ thống cài đặt gói âm thanh mới và cài các thành phần đồ họa cho Chromium
     - name: Install Playwright Browsers and OS Dependencies
       run: |
-        sudo npx playwright install-deps chromium
+        sudo apt-get update
+        # 1. Ép cài gói thay thế libasound2t64 trước
+        sudo apt-get install -y libasound2t64
+        # 2. Cài đặt các thư viện đồ họa nền tảng mà không gọi gói libasound2 bị lỗi
+        sudo apt-get install -y libgbm1 libnss3 libatk1.0-0 libatk-bridge2.0-0 libcups2 libdrm2 libxkbcommon0 libxcomposite1 libxdamage1 libxext6 libxfix6 libxrandr2 libpango-1.0-0 libcairo2
+        # 3. Chỉ cài đặt trình duyệt thuần túy (bỏ qua lệnh cài deps mặc định của Playwright)
         playwright install chromium
 
     # Bước 5: Kích hoạt chạy con bot mã nguồn của anh
