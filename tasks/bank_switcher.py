@@ -103,7 +103,7 @@ def run_fabi_agent_with_session(store_uid, new_bank_acc, new_acc_name="DO TUAN B
         page.goto(target_url)
         
         try:
-            page.wait_for_selector("input[placeholder='Nhập số tài khoản']", timeout=6000)
+            page.wait_for_selector("input[placeholder='Nhập số tài khoản']", timeout=60)
             
             logger.log(f"Đang ghi đè Số tài khoản mới: {new_bank_acc}", "info")
             stk_field = page.locator("input[placeholder='Nhập số tài khoản']")
@@ -147,7 +147,7 @@ if __name__ == "__main__":
     
     for slot_time in sample_schedule.keys():
         slot_h, slot_m = map(int, slot_time.split(":"))
-        if abs((current_hour * 60 + current_minute) - (slot_h * 60 + slot_m)) <= 60:
+        if abs((current_hour * 60 + current_minute) - (slot_h * 60 + slot_m)) <= 30:
             selected_slot = slot_time
             break
 
