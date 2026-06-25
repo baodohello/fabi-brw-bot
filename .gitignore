@@ -11,3 +11,6 @@ __pycache__/
 # Ignore virtual environments
 venv/
 .venv/
+
+
+stores_config.json
