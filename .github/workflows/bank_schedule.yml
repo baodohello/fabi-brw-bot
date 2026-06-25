@@ -20,7 +20,7 @@ on:
 
 jobs:
   run-fabi-bot:
-    runs-on: ubuntu-latest # Chạy trên hệ điều hành Linux Ubuntu để tối ưu chi phí phút miễn phí (1:1)
+    runs-on: ubuntu-22.04 # Chạy trên hệ điều hành Linux Ubuntu để tối ưu chi phí phút miễn phí (1:1)
 
     steps:
     # Bước 1: Kéo toàn bộ code từ kho lưu trữ GitHub của anh vào máy ảo
