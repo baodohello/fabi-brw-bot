@@ -43,7 +43,7 @@ jobs:
     - name: Install Playwright Browsers and OS Dependencies
       run: |
         sudo apt-get update
-        playwright install chromium --with-deps
+        playwright install chromium 
 
     # Bước 5: Kích hoạt chạy con bot mã nguồn của anh
     - name: Execute Bank Switcher Task
