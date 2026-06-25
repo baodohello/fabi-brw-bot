@@ -161,6 +161,7 @@ if __name__ == "__main__":
     now_str = datetime.now().strftime("%H:%M")
     current_hour = datetime.now().hour
     current_minute = datetime.now().minute
+    print("server time: ", now_str)
 
     # Lấy đại diện lịch trình của cửa hàng đầu tiên để tìm slot giờ khớp
     sample_schedule = list(STORES_CONFIG.values())[0]["schedule"]

@@ -42,7 +42,7 @@ jobs:
     # Bước 5: Kích hoạt chạy con bot mã nguồn của anh
     - name: Execute Bank Switcher Task
       env:
-        FABI_USERNAME: '${{ secrets.FABI_USERNAME }}'
-        FABI_PASSWORD: '${{ secrets.FABI_PASSWORD }}'
-        DISCORD_WEBHOOK_URL: '${{ secrets.DISCORD_WEBHOOK_URL }}'
+        FABI_USERNAME: ${{ secrets.FABI_USERNAME }}
+        FABI_PASSWORD: ${{ secrets.FABI_PASSWORD }}
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
       run: python -m tasks.bank_switcher
