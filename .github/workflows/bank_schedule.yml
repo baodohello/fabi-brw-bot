@@ -9,14 +9,13 @@ on:
     - cron: '30 6 * * *'    # Chạy lúc 1:30 PM giờ Việt Nam
     - cron: '30 9 * * *'    # Chạy lúc 4:30 PM giờ Việt Nam
 
-  workflow_dispatch: # Giúp có nút "Run workflow" trên giao diện GitHub để bấm chạy thử bằng tay bất cứ lúc nào
+  workflow_dispatch: # Bấm nút chạy thử bằng tay trên giao diện web GitHub
 
 jobs:
   run-fabi-bot:
     runs-on: ubuntu-latest 
     
-    # 🐳 CHẠY TRÊN MÔI TRƯỜNG DOCKER CHÍNH THỨC CỦA PLAYWRIGHT
-    # Môi trường này đã cài sẵn mọi thư viện âm thanh, đồ họa và Chromium chuẩn hóa từ gốc
+    # 🐳 Chạy trên môi trường Docker của chính Playwright
     container:
       image: mcr.microsoft.com/playwright:v1.44.0-jammy
 
@@ -25,17 +24,17 @@ jobs:
     - name: Checkout repository code
       uses: actions/checkout@v4
 
-    # Bước 2: Cài đặt các thư viện Python cần thiết
+    # Bước 2: Cài đặt pip cho Linux và nạp các thư viện Python cần thiết
     - name: Install dependencies
       run: |
-        python3 -m pip3 install --upgrade pip
+        sudo apt-get update && sudo apt-get install -y python3-pip
+        python3 -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install playwright requests python-dotenv; fi
 
-    # Bước 3: Kích hoạt chạy con bot mã nguồn của anh luôn (Bỏ hoàn toàn bước cài đặt browsers bị lỗi)
+    # Bước 3: Kích hoạt chạy con bot mã nguồn của anh luôn
     - name: Execute Bank Switcher Task
       env:
         FABI_USERNAME: '${{ secrets.FABI_USERNAME }}'
         FABI_PASSWORD: '${{ secrets.FABI_PASSWORD }}'
         DISCORD_WEBHOOK_URL: '${{ secrets.DISCORD_WEBHOOK_URL }}'
-      # Chạy script Python theo dạng Module từ thư mục gốc
       run: python3 -m tasks.bank_switcher
