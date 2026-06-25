@@ -39,11 +39,11 @@ jobs:
         python -m pip install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install playwright requests python-dotenv; fi
 
-    # Bước 4: Cập nhật chỉ mục thư viện hệ thống và Cài đặt trình duyệt Chromium cùng các phần phụ thuộc
+    # Bước 4: Sử dụng lệnh hệ thống của chính playwright để tự động xử lý các gói phụ thuộc
     - name: Install Playwright Browsers and OS Dependencies
       run: |
-        sudo apt-get update
-        playwright install chromium 
+        sudo npx playwright install-deps chromium
+        playwright install chromium
 
     # Bước 5: Kích hoạt chạy con bot mã nguồn của anh
     - name: Execute Bank Switcher Task
