@@ -1,1 +1,54 @@
 # GitHub Actions Cron settings
+name: Run FABI BRW Bank Sync Bot
+
+on:
+  schedule:
+    # ⚠️ LƯU Ý: Giờ của GitHub Actions sử dụng múi giờ Quốc tế (UTC).
+    # Việt Nam thuộc múi giờ UTC+7, nên ta phải LẤY GIỜ VIỆT NAM TRỪ ĐI 7 TIẾNG.
+    # - 06:00 VN -> 23:00 (đêm hôm trước)
+    # - 08:30 VN -> 01:30
+    # - 11:30 VN -> 04:30
+    # - 13:30 VN -> 06:30
+    # - 16:30 VN -> 09:30
+    - cron: '0 23 * * *'    # Chạy lúc 6:00 AM giờ Việt Nam
+    - cron: '30 1 * * *'    # Chạy lúc 8:30 AM giờ Việt Nam
+    - cron: '30 4 * * *'    # Chạy lúc 11:30 AM giờ Việt Nam
+    - cron: '30 6 * * *'    # Chạy lúc 1:30 PM giờ Việt Nam
+    - cron: '30 9 * * *'    # Chạy lúc 4:30 PM giờ Việt Nam
+
+  workflow_dispatch: # Dòng này giúp anh có một nút "Run workflow" trên giao diện GitHub để bấm chạy thử bằng tay bất cứ lúc nào
+
+jobs:
+  run-fabi-bot:
+    runs-on: ubuntu-latest # Chạy trên hệ điều hành Linux Ubuntu để tối ưu chi phí phút miễn phí (1:1)
+
+    steps:
+    # Bước 1: Kéo toàn bộ code từ kho lưu trữ GitHub của anh vào máy ảo
+    - name: Checkout repository code
+      uses: actions/checkout@v4
+
+    # Bước 2: Cài đặt môi trường Python 3.11 trên máy ảo
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    # Bước 3: Cài đặt các thư viện cần thiết (Playwright, Requests, v.v.)
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install playwright requests python-dotenv; fi
+
+    # Bước 4: Cài đặt trình duyệt Chromium (Chrome ngầm) và các thư viện hệ thống đi kèm của Linux
+    - name: Install Playwright Browsers and OS Dependencies
+      run: playwright install chromium --with-deps
+
+    # Bước 5: Kích hoạt chạy con bot mã nguồn của anh
+    - name: Execute Bank Switcher Task
+      env:
+        # Lấy các mật khẩu bí mật đã cấu hình trong mục "GitHub Secrets" và nạp vào biến môi trường hệ thống
+        FABI_USERNAME: ${{ secrets.FABI_USERNAME }}
+        FABI_PASSWORD: ${{ secrets.FABI_PASSWORD }}
+        DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      # Chạy script Python theo dạng Module từ thư mục gốc
+      run: python -m tasks.bank_switcher
