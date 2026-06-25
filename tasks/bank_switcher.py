@@ -5,7 +5,7 @@ from datetime import datetime
 from playwright.sync_api import sync_playwright
 from dotenv import load_dotenv
 # Import cấu hình và hàm lấy giờ VN từ file config.py vừa tạo
-from .config import STORES_CONFIG,VN_TZ
+from tasks.config import STORES_CONFIG,VN_TZ
 
 # IMPORT MODULE DISCORD VỪA TẠO
 from modules.discord_logger import DiscordLogger
@@ -40,7 +40,7 @@ def auto_login_and_save_session():
             logger.log("Đang nhấn nút Đăng nhập hệ thống...", "info")
             page.locator("button[type='submit']").click()
             
-            page.wait_for_url("**/dashboard**", timeout=20000)
+            page.wait_for_url("**/dashboard**", timeout=10000)
             logger.log("Đăng nhập thành công vào hệ thống quản trị iPOS!", "success")
             
             context.storage_state(path=SESSION_FILE)
@@ -71,7 +71,7 @@ def check_current_bank_info(store_uid):
         
         try:
             # Chờ xem có bị đá về trang login do hết hạn token không
-            page.wait_for_selector("input[placeholder='Nhập số tài khoản']", timeout=15000)
+            page.wait_for_selector("input[placeholder='Nhập số tài khoản']", timeout=10000)
             
             current_bank_name = page.locator(".text-selected p.text-link-blue b").inner_text()
             current_bank_acc = page.locator("input[placeholder='Nhập số tài khoản']").input_value()
@@ -103,7 +103,7 @@ def run_fabi_agent_with_session(store_uid, new_bank_acc, new_acc_name="DO TUAN B
         page.goto(target_url)
         
         try:
-            page.wait_for_selector("input[placeholder='Nhập số tài khoản']", timeout=60)
+            page.wait_for_selector("input[placeholder='Nhập số tài khoản']", timeout=10000)
             
             logger.log(f"Đang ghi đè Số tài khoản mới: {new_bank_acc}", "info")
             stk_field = page.locator("input[placeholder='Nhập số tài khoản']")
