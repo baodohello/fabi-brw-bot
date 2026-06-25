@@ -27,9 +27,8 @@ jobs:
     # Bước 2: Cài đặt và sử dụng lệnh pip3 chuẩn xác cho hệ thống
     - name: Install dependencies
       run: |
-        sudo apt-get update && sudo apt-get install -y python3-pip
-        pip3 install --upgrade pip
-        if [ -f requirements.txt ]; then pip3 install -r requirements.txt; else pip3 install playwright requests python-dotenv; fi
+        sudo apt-get update 
+        pip3 install -r requirements.txt
 
     # Bước 3: Kích hoạt chạy con bot mã nguồn của anh
     - name: Execute Bank Switcher Task
