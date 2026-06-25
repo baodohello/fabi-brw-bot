@@ -28,7 +28,7 @@ jobs:
     # Bước 2: Cài đặt các thư viện Python cần thiết
     - name: Install dependencies
       run: |
-        python3 -m pip install --upgrade pip
+        python3 -m pip3 install --upgrade pip
         if [ -f requirements.txt ]; then pip install -r requirements.txt; else pip install playwright requests python-dotenv; fi
 
     # Bước 3: Kích hoạt chạy con bot mã nguồn của anh luôn (Bỏ hoàn toàn bước cài đặt browsers bị lỗi)
