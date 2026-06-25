@@ -4,6 +4,8 @@ import sys
 from datetime import datetime
 from playwright.sync_api import sync_playwright
 from dotenv import load_dotenv
+# Import cấu hình và hàm lấy giờ VN từ file config.py vừa tạo
+from config import STORES_CONFIG,VN_TZ, get_current_vn_time_str
 
 # IMPORT MODULE DISCORD VỪA TẠO
 from modules.discord_logger import DiscordLogger
@@ -131,37 +133,13 @@ def run_fabi_agent_with_session(store_uid, new_bank_acc, new_acc_name="DO TUAN B
 
 # --- KỊCH BẢN PHỐI HỢP ---
 if __name__ == "__main__":
-    # 1. Ma trận cấu hình tài khoản theo khung giờ của cả 2 cửa hàng
-    STORES_CONFIG = {
-        "Cửa Hàng 1 (BRW 1)": {
-            "uid": "2f202b34-e339-4b89-85de-364b8cc61a18",
-            # 8h30 và 1h30 cài sang stk cty còn lại dùng stk cá nhân
-            "schedule": {
-                "06:00": {"stk": "8889060473", "ten": "TRAN THI VAN OANH"},
-                "08:30": {"stk": "8889060473", "ten": "TRAN THI VAN OANH"},
-                "11:30": {"stk": "8889060473", "ten": "TRAN THI VAN OANH"},
-                "13:30": {"stk": "8889060473", "ten": "TRAN THI VAN OANH"},
-                "16:30": {"stk": "8889060473", "ten": "TRAN THI VAN OANH"},
-            }
-        },
-        "Cửa Hàng 2 (BRW 2)": {
-            "uid": "1fbeca99-192e-4766-937a-c35e8f28737a",
-            # 8h30 và 1h30 cài sang stk cty còn lại dùng stk cá nhân
-            "schedule": {
-                "06:00": {"stk": "8807988664", "ten": "DO TUAN BAO"},
-                "08:30": {"stk": "8807988664", "ten": "DO TUAN BAO"},
-                "11:30": {"stk": "8807988664", "ten": "DO TUAN BAO"},
-                "13:30": {"stk": "8807988664", "ten": "DO TUAN BAO"},
-                "16:30": {"stk": "8807988664", "ten": "DO TUAN BAO"}
-            }
-        }
-    }
 
     # 2. Tự động xác định mốc giờ hệ thống khi kích hoạt kích hoạt script
-    now_str = datetime.now().strftime("%H:%M")
-    current_hour = datetime.now().hour
-    current_minute = datetime.now().minute
-    print("server time: ", now_str)
+    now_vn = datetime.now(VN_TZ)
+    now_str = now_vn.strftime("%H:%M")
+    current_hour = now_vn.hour
+    current_minute = now_vn.minute
+    print("⏰ Giờ hệ thống (Múi giờ Việt Nam):", now_str)
 
     # Lấy đại diện lịch trình của cửa hàng đầu tiên để tìm slot giờ khớp
     sample_schedule = list(STORES_CONFIG.values())[0]["schedule"]
