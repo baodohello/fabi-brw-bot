@@ -147,7 +147,7 @@ if __name__ == "__main__":
     
     for slot_time in sample_schedule.keys():
         slot_h, slot_m = map(int, slot_time.split(":"))
-        if abs((current_hour * 60 + current_minute) - (slot_h * 60 + slot_m)) <= 1500:
+        if abs((current_hour * 60 + current_minute) - (slot_h * 60 + slot_m)) <= 60:
             selected_slot = slot_time
             break
 
