@@ -1,5 +1,6 @@
 import os
 import time
+import schedule
 
 from datetime import datetime
 from playwright.sync_api import sync_playwright
@@ -131,8 +132,7 @@ def run_fabi_agent_with_session(store_uid, new_bank_acc, new_acc_name="DO TUAN B
             browser.close()
 
 
-# --- KỊCH BẢN PHỐI HỢP ---
-if __name__ == "__main__":
+def job_run_sync():
 
     # 2. Tự động xác định mốc giờ hệ thống khi kích hoạt kích hoạt script
     now_vn = datetime.now(VN_TZ)
@@ -153,7 +153,7 @@ if __name__ == "__main__":
 
     if not selected_slot:
         logger.log(f"⚠️ Cảnh báo: Kích hoạt lúc {now_str} nhưng không khớp mốc giờ cấu hình nào!", "warning")
-        exit()
+        return
 
     logger.log(f"🔔 **PHÁT HIỆN KHUNG GIỜ LÀM VIỆC: MỐC [{selected_slot}]**", "info")
 
@@ -179,7 +179,7 @@ if __name__ == "__main__":
                     os.remove(SESSION_FILE)
                 if not auto_login_and_save_session():
                     logger.log("❌ Không thể làm mới phiên đăng nhập. Dừng tiến trình.", "error")
-                    exit()
+                    return 
                 continue
             break
 
