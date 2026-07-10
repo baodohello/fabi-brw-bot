@@ -3,7 +3,7 @@ name: Run FABI BRW Bank Sync Bot
 
 on:
   # push:
-  #   branches: [ main ]
+  #   branches: [ main ]    # run on push to main branch
   # schedule:
   #   - cron: '0 23 * * *'  # Chạy lúc 06:00 VN
   #   - cron: '30 1 * * *'  # Chạy lúc 08:30 VN

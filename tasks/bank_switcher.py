@@ -1,65 +1,24 @@
 import os
 import time
 import schedule
-
 from datetime import datetime
 from playwright.sync_api import sync_playwright
 from dotenv import load_dotenv
-# Import cấu hình và hàm lấy giờ VN từ file config.py vừa tạo
-from tasks.config import STORES_CONFIG,VN_TZ
 
-# IMPORT MODULE DISCORD VỪA TẠO
+from tasks.config import STORES_CONFIG, VN_TZ
 from modules.discord_logger import DiscordLogger
 
-# Khởi tạo một bản dùng chung cho toàn bộ file
+# IMPORT AUTH MODULE VỪA TÁCH
+from modules.fabi_auth import SESSION_FILE, ensure_valid_session
+
 logger = DiscordLogger()
-
 load_dotenv()
-USER = os.getenv("FABI_USERNAME", "brwcoffee2021@gmail.com")
-PASSWORD = os.getenv("FABI_PASSWORD")
-SESSION_FILE = "fabi_auth_state.json"
-
-def auto_login_and_save_session():
-    """Hàm tự động điền tài khoản từ .env để đăng nhập và đóng gói session."""
-    if not PASSWORD:
-        logger.log("Chưa cấu hình FABI_PASSWORD trong file .env!", "error")
-        return False
-
-    with sync_playwright() as p:
-        logger.log(f"Agent khởi động trình duyệt để tự động đăng nhập tài khoản: {USER}...", "info")
-        browser = p.chromium.launch(headless=True)
-        context = browser.new_context()
-        page = context.new_page()
-        
-        page.goto("https://fabi.ipos.vn/#/login")
-        
-        try:
-            page.wait_for_selector("input[name='email_input']", timeout=10000)
-            page.locator("input[name='email_input']").fill(USER)
-            page.locator("input[type='password']").fill(PASSWORD)
-            
-            logger.log("Đang nhấn nút Đăng nhập hệ thống...", "info")
-            page.locator("button[type='submit']").click()
-            
-            page.wait_for_url("**/dashboard**", timeout=10000)
-            logger.log("Đăng nhập thành công vào hệ thống quản trị iPOS!", "success")
-            
-            context.storage_state(path=SESSION_FILE)
-            logger.log(f"Đã đóng gói và lưu phiên làm việc mới vào '{SESSION_FILE}'", "success")
-            browser.close()
-            return True
-        except Exception as e:
-            logger.log(f"Tự động đăng nhập thất bại hoặc sai thông tin: {str(e)}", "error")
-            browser.close()
-            return False
-
 
 def check_current_bank_info(store_uid):
     """Hàm CHỈ ĐỌC: Truy cập vào trang cấu hình để kiểm tra thông tin tài khoản hiện tại."""
-    if not os.path.exists(SESSION_FILE):
-        logger.log("Không tìm thấy file session. Tiến hành đăng nhập tạo mới...", "warning")
-        if not auto_login_and_save_session():
-            return None
+    # SỬ DỤNG AUTH MODULE ĐỂ KIỂM TRA SESSION
+    if not ensure_valid_session():
+        return None
 
     with sync_playwright() as p:
         logger.log("Agent đang mở trình duyệt ở chế độ CHỈ ĐỌC để kiểm tra dữ liệu...", "info")
@@ -71,7 +30,6 @@ def check_current_bank_info(store_uid):
         page.goto(target_url)
         
         try:
-            # Chờ xem có bị đá về trang login do hết hạn token không
             page.wait_for_selector("input[placeholder='Nhập số tài khoản']", timeout=10000)
             
             current_bank_name = page.locator(".text-selected p.text-link-blue b").inner_text()
@@ -84,13 +42,10 @@ def check_current_bank_info(store_uid):
                 "bank_acc": current_bank_acc,
                 "bank_acc_name": current_acc_name
             }
-            
         except Exception as e:
             browser.close()
-            # ĐÂY LÀ ĐIỂM CẢI TIẾN: Nếu lỗi do hết hạn phiên (bị đá ra form login), tự động xóa session cũ và báo để luồng chính xử lý
             logger.log(f"Phiên làm việc có thể đã hết hạn hoặc không tải được form VietQr.", "warning")
             return "EXPIRED"
-
 
 def run_fabi_agent_with_session(store_uid, new_bank_acc, new_acc_name="DO TUAN BAO"):
     """Dùng lại session đã lưu để cập nhật thông tin."""
@@ -106,23 +61,17 @@ def run_fabi_agent_with_session(store_uid, new_bank_acc, new_acc_name="DO TUAN B
         try:
             page.wait_for_selector("input[placeholder='Nhập số tài khoản']", timeout=10000)
             
-            logger.log(f"Đang ghi đè Số tài khoản mới: {new_bank_acc}", "info")
             stk_field = page.locator("input[placeholder='Nhập số tài khoản']")
             stk_field.fill(new_bank_acc)
-            stk_field.dispatch_event("change") # CẢI TIẾN: Ép giao diện Angular/Vue cập nhật model
+            stk_field.dispatch_event("change")
             
-            logger.log(f"Đang ghi đè Tên tài khoản mới: {new_acc_name}", "info")
             name_field = page.locator("input[placeholder='Nhập tên tài khoản']")
             name_field.fill(new_acc_name)
-            name_field.dispatch_event("change") # CẢI TIẾN: Ép giao diện Angular/Vue cập nhật model
+            name_field.dispatch_event("change")
             
             page.wait_for_timeout(1000)
             
-            logger.log("Đang kích hoạt nút 'Lưu' trên thanh công cụ tiêu đề...", "info")
             page.locator("#detailHeader button:has-text('Lưu')").click()
-            logger.log("Đã nhấn nút Lưu trên giao diện Web thành công.", "success")
-            
-            logger.log("Chờ 4 giây cho hệ thống đồng bộ dữ liệu lên máy chủ...", "info")
             page.wait_for_timeout(4000)
             return True
         except Exception as e:
@@ -131,17 +80,13 @@ def run_fabi_agent_with_session(store_uid, new_bank_acc, new_acc_name="DO TUAN B
         finally:
             browser.close()
 
-
 def job_run_sync():
-
-    # 2. Tự động xác định mốc giờ hệ thống khi kích hoạt kích hoạt script
     now_vn = datetime.now(VN_TZ)
     now_str = now_vn.strftime("%H:%M")
     current_hour = now_vn.hour
     current_minute = now_vn.minute
     print("⏰ Giờ hệ thống (Múi giờ Việt Nam):", now_str)
 
-    # Lấy đại diện lịch trình của cửa hàng đầu tiên để tìm slot giờ khớp
     sample_schedule = list(STORES_CONFIG.values())[0]["schedule"]
     selected_slot = None
     
@@ -157,7 +102,6 @@ def job_run_sync():
 
     logger.log(f"🔔 **PHÁT HIỆN KHUNG GIỜ LÀM VIỆC: MỐC [{selected_slot}]**", "info")
 
-    # 3. VÒNG LẶP CHẠY TUẦN TỰ LẦN LƯỢT TỪNG CỬA HÀNG
     for store_name, store_data in STORES_CONFIG.items():
         logger.log(f"\n=================== 🏪 {store_name.upper()} ===================", "info")
         
@@ -168,16 +112,14 @@ def job_run_sync():
 
         logger.log(f"🎯 Tài khoản cần cài đặt: ********{STK_MUC_TIEU[-4:]} ({TEN_MUC_TIEU})", "info")
 
-        # --- LUỒNG PHỐI HỢP CHECK & UPDATE CHO TỪNG QUÁN ---
         info_truoc = None
         for attempt in range(2):
             info_truoc = check_current_bank_info(STORE_UID)
             
             if info_truoc == "EXPIRED":
-                logger.log("🔄 Session hết hạn. Tiến hành xóa file và đăng nhập lại...", "warning")
-                if os.path.exists(SESSION_FILE):
-                    os.remove(SESSION_FILE)
-                if not auto_login_and_save_session():
+                logger.log("🔄 Session hết hạn. Tiến hành làm mới qua Auth Module...", "warning")
+                # GỌI HÀM LÀM MỚI VỚI THAM SỐ THAY THẾ CHO LUỒNG XÓA THỦ CÔNG CŨ
+                if not ensure_valid_session(force_refresh=True):
                     logger.log("❌ Không thể làm mới phiên đăng nhập. Dừng tiến trình.", "error")
                     return 
                 continue
@@ -191,7 +133,6 @@ def job_run_sync():
             else:
                 logger.log("🔄 Kết quả: Số tài khoản lệch pha! Kích hoạt Agent ghi đè dữ liệu...", "warning")
                 
-                # Thực hiện UPDATE
                 update_success = run_fabi_agent_with_session(STORE_UID, STK_MUC_TIEU, new_acc_name=TEN_MUC_TIEU)
                 
                 if update_success:
@@ -203,7 +144,7 @@ def job_run_sync():
                             f"📊 **BÁO CÁO CẬP NHẬT: {store_name}**\n"
                             f"• Mốc giờ: `{selected_slot}`\n"
                             f"• Trước khi chạy: `********{info_truoc['bank_acc'][-4:]}`\n"
-                            f"• Thực tế hiện tại: ``********{info_sau['bank_acc'][-4:]}`\n"
+                            f"• Thực tế hiện tại: `********{info_sau['bank_acc'][-4:]}`\n"
                             f"• Chủ tài khoản: `{info_sau['bank_acc_name']}`"
                         )
                         
@@ -218,7 +159,12 @@ def job_run_sync():
         else:
             logger.log(f"❌ Bỏ qua {store_name} do không lấy được dữ liệu hiện tại.", "error")
             
-        # Nghỉ ngắn 3 giây giữa các cửa hàng để chuyển đổi mượt mà, không bị dồn dập request
         time.sleep(3)
 
     logger.log("\n🏁 **HOÀN THÀNH TOÀN BỘ TIẾN TRÌNH CHO TẤT CẢ CỬA HÀNG**", "success")
+
+
+    
+if __name__ == "__main__":
+    # Test block to run manually
+    job_run_sync()
