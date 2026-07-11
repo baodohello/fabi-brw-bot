@@ -1,14 +1,14 @@
 # File Route: tasks/vat_sync/helpers/select_filter.py
 
-import os
 from tasks.vat_sync import selectors
 
 
 def select_filter(
         page, 
+        date_range_name: str,
         store_name: str,
-        date_range_name: str = "Hôm nay",
-        pttt_name: str = "Tất cả PTTT") -> bool:
+        pttt_name: str
+         ) -> bool:
     """
     Mở bộ chọn khoảng ngày (Daterange picker) và bấm chọn phím tắt theo tham số truyền vào.
     Các giá trị mặc định có sẵn trên giao diện: "Hôm nay", "Hôm qua", "7 ngày trước", "Tháng này", "Tháng trước"
@@ -47,7 +47,7 @@ def select_filter(
         print(f"🎉 Đã chọn điểm áp dụng '{store_name}' thành công.", "success")
 
         print(f"Đang mở danh sách bộ lọc PTTT để tìm '{pttt_name}'...", "info")
-        dropdown_trigger = page.locator(selectors.DROPDOWN_PTTT_FILTER)
+        dropdown_trigger = page.locator(selectors.DROPDOWN_PTTT_FILTER).nth(1)  # Lấy dropdown thu 2 (PTTT)
         dropdown_trigger.wait_for(state="visible", timeout=300)
         dropdown_trigger.click()
         # Đợi hiệu ứng animation đổ danh sách xuống hoàn tất

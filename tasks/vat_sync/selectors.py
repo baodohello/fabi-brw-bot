@@ -12,7 +12,7 @@ DROPDOWN_STORES_FILTER = ".select-store-filter .select-on-list"
 DROPDOWN_STORE_ITEMS = "ul.list-group__container li"
 # --- THÊM SELECTOR CHO PHƯƠNG THỨC THANH TOÁN (PTTT) ---
 # Dùng locator có chứa text mặc định để tìm đúng thẻ div bao ngoài của cụm PTTT
-DROPDOWN_PTTT_FILTER = ".kit-select__container:has-text('Tất cả PTTT')"
+DROPDOWN_PTTT_FILTER = "div.select-on-list[style*='max-width: 150px']"
 DROPDOWN_PTTT_ITEMS = "ul.list-group__container li" 
 
 # Selector phân trang dữ liệu

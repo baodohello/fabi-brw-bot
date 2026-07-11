@@ -65,7 +65,7 @@ def run_vat_sync_report_task() -> bool:
 
             for store_name, pttt_configs in setting.items():
                 for pttt_name, config in pttt_configs.items():
-                    if helpers.select_filter(page, store_name, date_range_name="Hôm nay", pttt_name=pttt_name):
+                    if helpers.select_filter(page,date_range_name="Hôm nay", store_name=store_name,  pttt_name=pttt_name):
                         print(f"🎉 Đã áp dụng bộ lọc: Chi nhánh '{store_name}', PTTT '{pttt_name}', Ngày 'Hôm nay'.", "success")
 
                         buyer_name = config["buyer_name"]
