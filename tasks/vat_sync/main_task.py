@@ -52,78 +52,55 @@ def run_vat_sync_report_task() -> bool:
             # 1. Chuyển sang tab "Hóa đơn chưa xuất VAT" bằng Selector tập trung
             print(f"Đang kích hoạt chọn tab '{selectors.TAB_CHUA_XUAT_VAT}'...", "info")
             tab_locator = page.get_by_role("tab", name=selectors.TAB_CHUA_XUAT_VAT)
-            tab_locator.wait_for(state="visible", timeout=500)
+            tab_locator.wait_for(state="visible", timeout=300)
             tab_locator.click(force=True)
             print(f"🎉 Đã chuyển thành công sang tab '{selectors.TAB_CHUA_XUAT_VAT}'.", "success")
-            helpers.select_date_filter(page, "Hôm nay")   
-            print(f"🎉 Đã áp dụng bộ lọc ngày 'Hôm nay' thành công.", "success")             
-
 
            # =========================================================================
             # 2. Xử lý dữ liệu cho chi nhánh 
             # =========================================================================
-            # Giả định biến `setting` đã được khai báo như cấu trúc của bạn
             setting = STORES_SETTING  # Lấy cấu hình từ file config.py
             # --- VÒNG LẶP CHÍNH CỦA BOT ---
             # 1. Duyệt qua từng chi nhánh (Store)
+
             for store_name, pttt_configs in setting.items():
-                print(f"==================================================", "info")
-                logger.log(f"🚀 Bắt đầu xử lý chi nhánh: {store_name}", "info")
-                
-                # Thực hiện filter chọn Chi nhánh trên UI
-                if helpers.select_store_filter(page, store_name):
-                    logger.log(f"🎉 Đã chọn chi nhánh '{store_name}' thành công.", "success")
-                    
-                    # 2. Duyệt qua từng phương thức thanh toán (PTTT) có trong chi nhánh đó
-                    for pttt_name, config in pttt_configs.items():
-                        print(f"--------------------------------------------------", "info")
-                        print(f"🔍 Đang xử lý PTTT: {pttt_name} của {store_name}", "info")
-                        
-                        # Đọc động cấu hình từ JSON cho PTTT hiện tại
+                for pttt_name, config in pttt_configs.items():
+                    if helpers.select_filter(page, store_name, date_range_name="Hôm nay", pttt_name=pttt_name):
+                        print(f"🎉 Đã áp dụng bộ lọc: Chi nhánh '{store_name}', PTTT '{pttt_name}', Ngày 'Hôm nay'.", "success")
+
                         buyer_name = config["buyer_name"]
                         start_time = config["start_time"]
                         end_time = config["end_time"]
+
+                        print(f"--- Bắt đầu quét hóa đơn [{start_time} - {end_time}] ---", "info")
                         
-                        # Thực hiện filter chọn PTTT trên UI
-                        if helpers.select_pttt_filter(page, pttt_name):
-                            logger.log(f"🎉 Đã chọn phương thức thanh toán '{pttt_name}' thành công.", "success")
-                            
-                            # Chờ bảng dữ liệu tải lại ứng với bộ lọc mới
-                            page.wait_for_timeout(3000) 
-                            print(f"--- Bắt đầu quét hóa đơn [{start_time} - {end_time}] ---", "info")
-                            
-                            # Truyền dynamic tham số thời gian vào hàm xử lý
-                            invoice_summary = helpers.process_and_tick_invoices(
-                                page, 
-                                start_time=start_time, 
-                                end_time=end_time
+                        # Truyền dynamic tham số thời gian vào hàm xử lý
+                        invoice_summary = helpers.process_and_tick_invoices(
+                            page, 
+                            start_time=start_time, 
+                            end_time=end_time
+                        )
+                        
+                        total_count = invoice_summary["total_processed_count"]
+                        total_amount = invoice_summary["total_processed_amount"]
+
+                        if total_count > 0:
+                            helpers.export_vat_details(page, buyer_name=buyer_name)
+                            logger.log(
+                                f"🎉 Hoàn tất báo cáo VAT cho '{store_name}' - PTTT '{pttt_name}'.\n"
+                                f"- Khách hàng nhập: {buyer_name}\n"
+                                f"- Số lượng: {total_count} đơn\n"
+                                f"- Tổng tiền: {total_amount:,} ₫", 
+                                "success"
                             )
-                            
-                            total_count = invoice_summary["total_processed_count"]
-                            total_amount = invoice_summary["total_processed_amount"]
+                            page.wait_for_timeout(10000)  # Đợi 10 giây để modal xuất VAT hoàn tất
 
-                            # Nếu có hóa đơn hợp lệ thì tiến hành xuất chi tiết
-                            if total_count > 0:
-                                # Truyền dynamic buyer_name tương ứng vào đây
-                                helpers.export_vat_details(page, buyer_name=buyer_name, total_count=total_count)
-                                
-                                logger.log(
-                                    f"🎉 Hoàn tất báo cáo VAT cho '{store_name}' - PTTT '{pttt_name}'.\n"
-                                    f"- Khách hàng nhập: {buyer_name}\n"
-                                    f"- Số lượng tích: {total_count} đơn\n"
-                                    f"- Tổng tiền: {total_amount:,} ₫", 
-                                    "success"
-                                )
-                            else:
-                                print(f"⚠️ PTTT '{pttt_name}' của chi nhánh '{store_name}' không có hóa đơn nào thỏa mãn điều kiện.", "warning")
                         else:
-                            logger.log(f"❌ Không thể chọn bộ lọc PTTT '{pttt_name}' trên giao diện.", "error")
-                else:
-                    logger.log(f"❌ Không thể chọn bộ lọc chi nhánh '{store_name}' trên giao diện.", "error")
-
-            print("==================================================", "success")
+                            logger.log(f"⚠️ PTTT '{pttt_name}' của chi nhánh '{store_name}' không có hóa đơn nào thỏa mãn điều kiện.", "warning")
+            
+            
             logger.log("🏁 Đã chạy xong toàn bộ danh sách chi nhánh và phương thức thanh toán cấu hình!", "success")
-            page.wait_for_timeout(10000)
+            page.wait_for_timeout(5000)
             return True
             
         except Exception as e:

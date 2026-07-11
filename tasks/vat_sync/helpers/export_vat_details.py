@@ -1,7 +1,6 @@
 
 
 import os
-from modules.discord_logger import DiscordLogger
 
 
 def export_vat_details(page, buyer_name: str = "3C") -> bool:
