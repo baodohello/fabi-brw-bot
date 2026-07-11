@@ -1,5 +1,5 @@
 from datetime import datetime
-from playwright.sync_api import Page, TimeoutError  # Thêm TimeoutError để bắt lỗi nếu bảng trống
+from playwright.sync_api import Page, TimeoutError  
 from tasks.vat_sync import selectors
 
 
@@ -29,11 +29,9 @@ def process_and_tick_invoices(
         
         rows = []
         try:
-            # Đợi bảng dữ liệu hiển thị ổn định
-            page.wait_for_selector(selectors.TABLE_ROWS, timeout=2000) # Tăng nhẹ timeout hoặc giữ nguyên tùy cấu trúc trang
+            page.wait_for_selector(selectors.TABLE_ROWS, timeout=3000) 
             rows = page.locator(selectors.TABLE_ROWS).all()
         except TimeoutError:
-            # Bắt trường hợp không có dòng nào hiển thị (bảng trống hoàn toàn)
             print("⚠️ Không tìm thấy phần tử hàng hóa đơn nào trên giao diện (Timeout).", "warning")
             
         # Xử lý trường hợp tìm thấy 0 dòng hóa đơn
@@ -45,14 +43,10 @@ def process_and_tick_invoices(
         print(f"Tìm thấy {len(rows)} hóa đơn trên trang hiện tại. Bắt đầu kiểm tra (Khung giờ: {start_time} - {end_time})...", "info")
         
         for index, row in enumerate(rows, start=1):
-            # 1. Lấy mã hóa đơn để ghi log báo cáo
             invoice_code = row.locator(selectors.ROW_INVOICE_CODE).text_content().strip()
-            
-            # 2. Lấy dữ liệu Tổng tiền và chuẩn hóa sang dạng số nguyên (Int)
             amount_str = row.locator(selectors.ROW_TOTAL_AMOUNT).text_content().strip()
             # Xóa chữ '₫' và dấu phẩy ngăn cách hàng nghìn (ví dụ: "45,000 ₫" -> 45000)
             amount = int(amount_str.replace("₫", "").replace(",", "").strip())
-            
             # 3. Lấy dữ liệu Thời gian ra và chuyển đổi thành Object datetime để so sánh giờ
             time_str = row.locator(selectors.ROW_OUT_TIME).text_content().strip()
             # Định dạng trong HTML là "dd/mm/yyyy HH:MM" (ví dụ: "10/07/2026 15:45")
@@ -64,21 +58,10 @@ def process_and_tick_invoices(
             is_time_valid = start_valid_time < invoice_time < end_valid_time
             
             if is_amount_valid and is_time_valid:
-                # Tìm thẻ Checkbox của dòng hiện tại
-                # 1. Định vị chính xác thẻ input ẩn (để kiểm tra trạng thái true/false)
                 checkbox_input = row.locator(selectors.ROW_CHECKBOX_INPUT)
-
-                # 2. Định vị chính xác thẻ label hiển thị
                 checkbox_label = row.locator(selectors.ROW_CHECKBOX_LABEL)
-
-                # Kiểm tra xem hóa đơn này đã được chọn hay chưa bằng input ẩn
                 if not checkbox_input.is_checked():
-                    # Sử dụng evaluate để kích hoạt click bằng JavaScript trực tiếp trên phần tử label
                     checkbox_label.evaluate("element => element.click()")
-                    
-                    # Ghi log xác nhận dòng đã được xử lý
-                    print(f"  -> Đã kích hoạt click JavaScript thành công cho hóa đơn {invoice_code}", "info")
-                
                 # Cộng dồn số liệu vào bảng thống kê
                 summary["total_processed_count"] += 1
                 summary["total_processed_amount"] += amount
@@ -90,14 +73,6 @@ def process_and_tick_invoices(
                 if not is_time_valid: reason.append(f"Thời gian nằm ngoài khung {start_time} - {end_time}")
                 print(f"  [Dòng {index}] Hóa đơn {invoice_code} BỊ BỎ QUA. Lý do: {', '.join(reason)} ({amount_str} - {time_str})", "warning")
                 
-        # In báo cáo tổng hợp kết quả sau khi duyệt xong trang
-        print(
-            f"📊 KẾT QUẢ TRANG HIỆN TẠI:\n"
-            f"- Tổng số hóa đơn hợp lệ đã tích: {summary['total_processed_count']} đơn\n"
-            f"- Tổng số tiền tích lũy: {summary['total_processed_amount']:,} ₫", 
-            "success"
-        )
-        
     except Exception as e:
         print(f"❌ Thao tác xử lý tính toán dữ liệu bảng hóa đơn thất bại: {str(e)}", "error")
         
