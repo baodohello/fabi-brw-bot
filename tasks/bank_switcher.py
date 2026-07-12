@@ -1,3 +1,5 @@
+"""Tác vụ tự động đổi số tài khoản ngân hàng hiển thị trên iPOS FABI theo khung giờ ca làm việc."""
+
 import os
 import time
 import schedule
@@ -5,7 +7,7 @@ from datetime import datetime
 from playwright.sync_api import sync_playwright
 from dotenv import load_dotenv
 
-from tasks.config import STORES_CONFIG, VN_TZ
+from config import BANK_SCHEDULE, VN_TZ
 from modules.discord_logger import DiscordLogger
 
 # IMPORT AUTH MODULE VỪA TÁCH
@@ -87,7 +89,7 @@ def job_run_sync():
     current_minute = now_vn.minute
     print("⏰ Giờ hệ thống (Múi giờ Việt Nam):", now_str)
 
-    sample_schedule = list(STORES_CONFIG.values())[0]["schedule"]
+    sample_schedule = list(BANK_SCHEDULE.values())[0]["schedule"]
     selected_slot = None
     
     for slot_time in sample_schedule.keys():
@@ -102,7 +104,7 @@ def job_run_sync():
 
     logger.log(f"🔔 **PHÁT HIỆN KHUNG GIỜ LÀM VIỆC: MỐC [{selected_slot}]**", "info")
 
-    for store_name, store_data in STORES_CONFIG.items():
+    for store_name, store_data in BANK_SCHEDULE.items():
         logger.log(f"\n=================== 🏪 {store_name.upper()} ===================", "info")
         
         STORE_UID = store_data["uid"]

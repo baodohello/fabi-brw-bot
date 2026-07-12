@@ -1,3 +1,5 @@
+"""Cấu hình VAT: ánh xạ chi nhánh → phương thức thanh toán → tên người mua + khung giờ xử lý."""
+
 # vat_config.py
 
 STORES_SETTING = {

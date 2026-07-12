@@ -1,8 +1,10 @@
+"""Tác vụ chính đồng bộ hóa đơn VAT: lọc hóa đơn chưa xuất theo chi nhánh & PTTT, tích chọn và xuất VAT."""
+
 import os
 import sys
 from playwright.sync_api import sync_playwright
 from dotenv import load_dotenv
-from vat_config import STORES_SETTING 
+from config import STORES_SETTING 
 
 # Auto-adjust Python path hỗ trợ chạy kiểm tra thủ công file này từ terminal
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

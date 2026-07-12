@@ -1,3 +1,5 @@
+"""Xác thực iPOS FABI: tự động đăng nhập, lưu phiên (session), và kiểm tra/refresh phiên khi hết hạn."""
+
 import os
 from playwright.sync_api import sync_playwright
 from dotenv import load_dotenv

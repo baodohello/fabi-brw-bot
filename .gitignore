@@ -3,6 +3,7 @@
 
 # Ignore local browser session data and authentication states
 fabi_auth_state.json
+meinvoice_auth_state.json
 
 # Ignore Python cache files
 __pycache__/

@@ -1,11 +1,10 @@
 import time
-from datetime import datetime
 import schedule
 
 # Import hàm xử lý chính từ package tasks
 from tasks.bank_switcher import job_run_sync
 from tasks.vat_sync import run_vat_sync_report_task
-from tasks.config import VN_TZ
+from config import VN_TZ
 from modules.discord_logger import DiscordLogger
 
 logger = DiscordLogger()
