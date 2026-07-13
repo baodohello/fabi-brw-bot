@@ -22,10 +22,10 @@ if __name__ == "__main__":
     # Đăng ký các mốc giờ đổi ca của quán cho các ngày trong tuần
     for day in weekdays:
         day.at("06:00").do(job_run_sync)
-        day.at("08:30").do(job_run_sync)
+        day.at("09:00").do(job_run_sync)
         day.at("11:30").do(job_run_sync)
         day.at("13:30").do(job_run_sync)
-        day.at("16:30").do(job_run_sync)
+        day.at("15:30").do(job_run_sync)
 
 
     # schedule.every().day.at("13:00").do(run_vat_sync_report_task)

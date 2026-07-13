@@ -37,7 +37,7 @@ python -m tasks.vat_sync.main_task
 
 # Chạy riêng tác vụ
 python -m tasks.invoice_validator.main
-```
+``` 
 
 
 chrome user data dir 

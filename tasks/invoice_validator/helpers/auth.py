@@ -85,7 +85,8 @@ def ensure_meinvoice_session(force_refresh=False) -> bool:
     if force_refresh and os.path.exists(MEINVOICE_SESSION_FILE):
         logger.log("🔄 Đang xóa phiên MeInvoice cũ theo yêu cầu làm mới...", "warning")
         try:
-            os.remove(MEINVOICE_SESSION_FILE)
+            # os.remove(MEINVOICE_SESSION_FILE)
+            print(f"  ⚠️ Đang xóa file session MeInvoice: {MEINVOICE_SESSION_FILE}...", "warning")
         except Exception:
             pass
 
