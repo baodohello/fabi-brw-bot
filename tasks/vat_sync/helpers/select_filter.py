@@ -43,7 +43,7 @@ def select_filter(
         store_option = page.locator(selectors.DROPDOWN_STORE_ITEMS).filter(has_text=store_name)
         store_option.wait_for(state="visible", timeout=300)
         store_option.click(force=True)
-        page.wait_for_timeout(300) 
+        page.wait_for_timeout(1000) # Đợi 1 giây để giao diện load lại danh sách hóa đơn theo cửa hàng mới
         print(f"🎉 Đã chọn điểm áp dụng '{store_name}' thành công.", "success")
 
         print(f"Đang mở danh sách bộ lọc PTTT để tìm '{pttt_name}'...", "info")
@@ -51,12 +51,12 @@ def select_filter(
         dropdown_trigger.wait_for(state="visible", timeout=300)
         dropdown_trigger.click()
         # Đợi hiệu ứng animation đổ danh sách xuống hoàn tất
-        page.wait_for_timeout(300) 
+        page.wait_for_timeout(1000) 
         print(f"Đang tìm và bấm chọn phương thức thanh toán: {pttt_name}...", "info")
         pttt_option = page.locator(selectors.DROPDOWN_PTTT_ITEMS).filter(has_text=pttt_name)
         pttt_option.wait_for(state="visible", timeout=300)
         pttt_option.click(force=True)
-        page.wait_for_timeout(300)
+        page.wait_for_timeout(1000)
         print(f"🎉 Đã lọc Phương thức thanh toán '{pttt_name}' thành công.", "success")
         return True
     except Exception as e:

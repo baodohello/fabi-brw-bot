@@ -13,6 +13,7 @@ from modules.discord_logger import DiscordLogger
 from tasks.invoice_validator.helpers.auth import (
     MEINVOICE_SESSION_FILE,
     ensure_meinvoice_session,
+    auto_login_on_page,
 )
 from tasks.invoice_validator.helpers import select_filter, process_invoice_rows
 from config.invoice_validator import BUYER_PREFIXES
@@ -45,13 +46,16 @@ def run_invoice_validator_task() -> bool:
             page.goto("https://app3.meinvoice.vn/v3/hoa-don-may-tinh-tien")
             page.wait_for_timeout(1000)
 
-            # Kiểm tra nếu session hết hạn → đăng nhập lại
+            # Kiểm tra nếu session hết hạn → tự động điền mật khẩu và tiếp tục
             if "/login" in page.url:
-                logger.log("🔄 Session MeInvoice hết hạn. Tiến hành làm mới...", "warning")
-                browser.close()
-                if ensure_meinvoice_session(force_refresh=True):
-                    return run_invoice_validator_task()  # Thử lại với session mới
-                return False
+                logger.log("🔄 Session MeInvoice hết hạn. Tự động đăng nhập lại...", "warning")
+                if not auto_login_on_page(page, context):
+                    logger.log("❌ Tự động đăng nhập thất bại.", "error")
+                    browser.close()
+                    return False
+                # Đăng nhập xong → điều hướng lại trang hóa đơn
+                page.goto("https://app3.meinvoice.vn/v3/hoa-don-may-tinh-tien")
+                page.wait_for_timeout(2000)
 
             logger.log(f"✅ Truy cập thành công MeInvoice! URL: {page.url}", "success")
 

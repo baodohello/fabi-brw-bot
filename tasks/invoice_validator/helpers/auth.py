@@ -86,7 +86,7 @@ def ensure_meinvoice_session(force_refresh=False) -> bool:
         logger.log("🔄 Đang xóa phiên MeInvoice cũ theo yêu cầu làm mới...", "warning")
         try:
             # os.remove(MEINVOICE_SESSION_FILE)
-            print(f"  ⚠️ Đang xóa file session MeInvoice: {MEINVOICE_SESSION_FILE}...", "warning")
+            print(f"Đã xóa file session MeInvoice: {MEINVOICE_SESSION_FILE}")
         except Exception:
             pass
 
@@ -96,3 +96,65 @@ def ensure_meinvoice_session(force_refresh=False) -> bool:
 
     logger.log("✅ Đã tìm thấy file session MeInvoice.", "success")
     return True
+
+
+def auto_login_on_page(page, context) -> bool:
+    """
+    Tự động đăng nhập MeInvoice trên trang đã mở sẵn (khi session hết hạn).
+    Xử lý cả 3 bước: email/SĐT → mật khẩu → OTP (nếu có).
+    Lưu session mới sau khi đăng nhập thành công.
+
+    :param page:   Playwright Page object đang ở trang login
+    :param context: Playwright BrowserContext (để lưu session sau login)
+    :return: True nếu đăng nhập thành công và đã lưu session
+    """
+    if not MEINVOICE_USERNAME or not MEINVOICE_PASSWORD:
+        logger.log("❌ Chưa cấu hình MEINVOICE_USERNAME / MEINVOICE_PASSWORD trong .env", "error")
+        return False
+
+    try:
+        # --- Bước 1: Nhập email/SĐT (nếu đang ở step 1) ---
+        step1_input = page.locator(selectors.LOGIN_USERNAME_INPUT)
+        if step1_input.count() > 0 and step1_input.is_visible():
+            logger.log(f"🔐 Bước 1: Tự động nhập email/SĐT ({MEINVOICE_USERNAME})...", "info")
+            step1_input.fill(MEINVOICE_USERNAME)
+            page.locator(selectors.LOGIN_STEP1_SUBMIT).click()
+            page.wait_for_timeout(2000)
+
+        # --- Bước 2: Nhập mật khẩu ---
+        step2_input = page.locator(selectors.LOGIN_PASSWORD_INPUT)
+        if step2_input.count() > 0 and step2_input.is_visible():
+            logger.log("🔐 Bước 2: Tự động nhập mật khẩu...", "info")
+            step2_input.fill(MEINVOICE_PASSWORD)
+            page.locator(selectors.LOGIN_STEP2_SUBMIT).click()
+            page.wait_for_timeout(3000)
+
+        # --- Bước 3: OTP (nếu có) ---
+        otp_container = page.locator(selectors.LOGIN_OTP_CONTAINER)
+        if otp_container.count() > 0 and otp_container.is_visible():
+            logger.log("📱 YÊU CẦU OTP! Vui lòng nhập mã OTP thủ công trong cửa sổ trình duyệt...", "warning")
+            logger.log("⏳ Đang đợi bạn nhập OTP và bấm 'Xác nhận' (tối đa 10 phút)...", "info")
+            try:
+                page.wait_for_function(
+                    "!window.location.href.includes('/login')",
+                    timeout=600000  # 10 phút
+                )
+                logger.log("✅ Xác thực OTP thành công!", "success")
+            except Exception:
+                logger.log("❌ Hết thời gian chờ OTP.", "error")
+                return False
+
+        # Kiểm tra kết quả đăng nhập
+        page.wait_for_timeout(2000)
+        if "/login" in page.url:
+            logger.log("❌ Tự động đăng nhập thất bại — vẫn ở trang login.", "error")
+            return False
+
+        # Lưu session mới
+        context.storage_state(path=MEINVOICE_SESSION_FILE)
+        logger.log(f"💾 Đã lưu phiên đăng nhập MeInvoice mới vào '{MEINVOICE_SESSION_FILE}'", "success")
+        return True
+
+    except Exception as e:
+        logger.log(f"❌ Lỗi khi tự động đăng nhập: {str(e)}", "error")
+        return False

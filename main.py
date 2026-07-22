@@ -13,19 +13,14 @@ if __name__ == "__main__":
     logger.log("🤖 FABI BRW Bot đã khởi động chế độ trực chiến 24/7...", "info")
 
     # 🌟 Đăng ký các mốc giờ đổi ca của quán tại đây (Dễ dàng thêm/bớt ca)
-    weekdays = [schedule.every().monday, 
-                schedule.every().tuesday, 
-                schedule.every().wednesday, 
-                schedule.every().thursday, 
-                schedule.every().friday]
-
-    # Đăng ký các mốc giờ đổi ca của quán cho các ngày trong tuần
-    for day in weekdays:
-        day.at("06:00").do(job_run_sync)
-        day.at("09:00").do(job_run_sync)
-        day.at("11:30").do(job_run_sync)
-        day.at("13:30").do(job_run_sync)
-        day.at("15:30").do(job_run_sync)
+    # Mỗi schedule.every() tạo 1 Job MỚI — gọi riêng để tránh .at() ghi đè lẫn nhau
+    times = ["06:00", "09:00", "11:30", "13:30", "15:30"]
+    for t in times:
+        schedule.every().monday.at(t).do(job_run_sync)
+        schedule.every().tuesday.at(t).do(job_run_sync)
+        schedule.every().wednesday.at(t).do(job_run_sync)
+        schedule.every().thursday.at(t).do(job_run_sync)
+        schedule.every().friday.at(t).do(job_run_sync)
 
 
     # schedule.every().day.at("13:00").do(run_vat_sync_report_task)
