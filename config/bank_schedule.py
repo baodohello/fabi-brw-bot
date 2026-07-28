@@ -12,9 +12,9 @@ BANK_SCHEDULE = {
         "schedule": {
             "06:00": {"stk": "8889060473", "ten": "TRAN THI VAN OANH"},
             "09:00": {"stk": "8613980666", "ten": "CONG TY TNHH NHA MAY SAN PHAM SINH HOC NUTRI PAX"},
-            "11:30": {"stk": "8889060473", "ten": "TRAN THI VAN OANH"},
-            "13:30": {"stk": "8613980666", "ten": "CONG TY TNHH NHA MAY SAN PHAM SINH HOC NUTRI PAX"},
-            "15:30": {"stk": "8889060473", "ten": "TRAN THI VAN OANH"},
+            "11:15": {"stk": "8889060473", "ten": "TRAN THI VAN OANH"},
+            "13:45": {"stk": "8613980666", "ten": "CONG TY TNHH NHA MAY SAN PHAM SINH HOC NUTRI PAX"},
+            "15:00": {"stk": "8889060473", "ten": "TRAN THI VAN OANH"},
         },
     },
     "Cửa Hàng 2 (BRW 2)": {
@@ -22,9 +22,9 @@ BANK_SCHEDULE = {
         "schedule": {
             "06:00": {"stk": "8889060473", "ten": "TRAN THI VAN OANH"},
             "09:00": {"stk": "8613980666", "ten": "CONG TY TNHH NHA MAY SAN PHAM SINH HOC NUTRI PAX"},
-            "11:30": {"stk": "8889060473", "ten": "TRAN THI VAN OANH"},
-            "13:30": {"stk": "8613980666", "ten": "CONG TY TNHH NHA MAY SAN PHAM SINH HOC NUTRI PAX"},
-            "15:30": {"stk": "8889060473", "ten": "TRAN THI VAN OANH"},
+            "11:15": {"stk": "8889060473", "ten": "TRAN THI VAN OANH"},
+            "13:45": {"stk": "8613980666", "ten": "CONG TY TNHH NHA MAY SAN PHAM SINH HOC NUTRI PAX"},
+            "15:00": {"stk": "8889060473", "ten": "TRAN THI VAN OANH"},
         },
     },
 }
