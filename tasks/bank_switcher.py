@@ -34,13 +34,13 @@ def check_current_bank_info(store_uid):
         try:
             page.wait_for_selector("input[placeholder='Nhập số tài khoản']", timeout=10000)
             
-            current_bank_name = page.locator(".text-selected p.text-link-blue b").inner_text()
+            # current_bank_name = page.locator(".text-selected p.text-link-blue b").inner_text()
             current_bank_acc = page.locator("input[placeholder='Nhập số tài khoản']").input_value()
             current_acc_name = page.locator("input[placeholder='Nhập tên tài khoản']").input_value()
             
             browser.close()
             return {
-                "bank_name": current_bank_name,
+                # "bank_name": current_bank_name,
                 "bank_acc": current_bank_acc,
                 "bank_acc_name": current_acc_name
             }
