@@ -28,7 +28,7 @@ def check_current_bank_info(store_uid):
         context = browser.new_context(storage_state=SESSION_FILE)
         page = context.new_page()
         
-        target_url = f"https://fabi.ipos.vn/setting/store/detail/{store_uid}"
+        target_url = f"https://fabi.ipos.vn/micro/setting/store/detail/{store_uid}"
         page.goto(target_url)
         
         try:
