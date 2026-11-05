@@ -57,7 +57,7 @@ def run_fabi_agent_with_session(store_uid, new_bank_acc, new_acc_name="DO TUAN B
         context = browser.new_context(storage_state=SESSION_FILE)
         page = context.new_page()
         
-        target_url = f"https://fabi.ipos.vn/setting/store/detail/{store_uid}"
+        target_url = f"https://fabi.ipos.vn/micro/setting/store/detail/{store_uid}"
         page.goto(target_url)
         
         try:
