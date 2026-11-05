@@ -25,7 +25,7 @@ def auto_login_and_save_session():
         context = browser.new_context()
         page = context.new_page()
         
-        page.goto("https://fabi.ipos.vn/#/login")
+        page.goto("https://fabi.ipos.vn/login")
         
         try:
             page.wait_for_selector("input[name='email_input']", timeout=10000)
