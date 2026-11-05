@@ -73,7 +73,7 @@ def run_fabi_agent_with_session(store_uid, new_bank_acc, new_acc_name="DO TUAN B
             
             page.wait_for_timeout(1000)
             
-            page.locator("#detailHeader button:has-text('Lưu')").click()
+            page.locator("button:has-text('Lưu')").click()
             page.wait_for_timeout(4000)
             return True
         except Exception as e:
