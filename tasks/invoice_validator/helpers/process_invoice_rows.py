@@ -21,7 +21,9 @@ def process_invoice_rows(
     processed_count = 0
 
     try:
-        page.wait_for_selector(selectors.TABLE_TBODY_ROWS, timeout=10000)
+        page.wait_for_timeout(1000)
+
+        page.wait_for_selector(selectors.TABLE_TBODY_ROWS, timeout=3000)
 
         while True:
             rows = page.locator(selectors.TABLE_TBODY_ROWS).all()
@@ -37,12 +39,12 @@ def process_invoice_rows(
                 # Bấm nút "Sửa"
                 edit_btn = row.locator(selectors.ROW_BTN_EDIT)
                 edit_btn.evaluate("element => element.click()")
-                page.wait_for_timeout(2000)
+                page.wait_for_timeout(1000)
                 print(f"  ✅ Đã click 'Sửa' cho hóa đơn {invoice_code}.", "success")
 
                 # Sửa Họ tên người mua, kiểm tra đơn giá, cân đối tổng tiền
                 fix_buyer_name(page, invoice_code)
-                page.wait_for_timeout(2000)
+                page.wait_for_timeout(1000)
                 result = fix_item_prices(page, invoice_code)
                 final_total = fix_total_amount(page, result["total_amount"], invoice_code)
 

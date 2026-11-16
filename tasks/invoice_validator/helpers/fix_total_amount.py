@@ -49,8 +49,7 @@ def fix_total_amount(page, items_total: float, invoice_code: str = "") -> float:
         amount_cell = first_row.locator(selectors.DETAIL_GRID_AMOUNT)
         amount_cell.scroll_into_view_if_needed()
         amount_cell.click(force=True, no_wait_after=True)
-        page.wait_for_timeout(800)
-        page.wait_for_timeout(500)
+        page.wait_for_timeout(50)
 
         # Debug: in HTML của cell sau khi click
         # cell_html = first_row.locator(selectors.DETAIL_GRID_AMOUNT).evaluate("el => el.outerHTML")
@@ -61,10 +60,10 @@ def fix_total_amount(page, items_total: float, invoice_code: str = "") -> float:
         editor = page.locator(selectors.EDITOR_AMOUNT)
         editor.fill("")
         editor.fill(str(int(new_amount)))
-        page.wait_for_timeout(300)
+        page.wait_for_timeout(50)
 
         editor.press("Enter")
-        page.wait_for_timeout(500)
+        page.wait_for_timeout(50)
 
         new_total = items_total + diff
         print(f"  ✅ Đã cân đối: {new_total:,.0f} + {vat:,.0f} = {new_total + vat:,.0f} ₫", "success")

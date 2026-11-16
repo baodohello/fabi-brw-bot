@@ -45,15 +45,15 @@ def fix_item_prices(page, invoice_code: str = "") -> dict:
                     price_cell = item_row.locator(selectors.DETAIL_GRID_UNIT_PRICE)
                     price_cell.scroll_into_view_if_needed()
                     price_cell.click(force=True, no_wait_after=True)
-                    page.wait_for_timeout(800)
+                    page.wait_for_timeout(50)
 
                     # Fill giá đúng
                     editor = page.locator(selectors.EDITOR_UNIT_PRICE)
                     editor.fill(str(int(correct_price)))
-                    page.wait_for_timeout(300)
+                    page.wait_for_timeout(50)
 
                     editor.press("Enter")
-                    page.wait_for_timeout(500)
+                    page.wait_for_timeout(50)
 
                     print(f"    ✅ Dòng {idx}: Đã sửa Đơn giá → {correct_price:,.0f}", "success")
                     fixed_count += 1

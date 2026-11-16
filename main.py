@@ -14,7 +14,14 @@ if __name__ == "__main__":
 
     # 🌟 Đăng ký các mốc giờ đổi ca của quán tại đây (Dễ dàng thêm/bớt ca)
     # Mỗi schedule.every() tạo 1 Job MỚI — gọi riêng để tránh .at() ghi đè lẫn nhau
-    times = ["06:00", "09:00", "11:30", "13:45", "15:15"]
+    times = [
+        "06:00", 
+        "09:00", "11:30", 
+        "12:00", "12:15",
+        "13:30", "16:00",
+        "17:00", "17:15",
+        "18:00", "18:15" #hqua chua xuat
+        ]
     for t in times:
         schedule.every().monday.at(t).do(job_run_sync)
         schedule.every().tuesday.at(t).do(job_run_sync)

@@ -94,7 +94,7 @@ def job_run_sync():
     
     for slot_time in sample_schedule.keys():
         slot_h, slot_m = map(int, slot_time.split(":"))
-        if abs((current_hour * 60 + current_minute) - (slot_h * 60 + slot_m)) <= 30:
+        if abs((current_hour * 60 + current_minute) - (slot_h * 60 + slot_m)) <= 10: #time limit for correct slot
             selected_slot = slot_time
             break
 
