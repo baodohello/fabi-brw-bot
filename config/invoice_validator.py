@@ -4,12 +4,13 @@
 BUYER_NAME_MAP = {
     # "3": "Bán cho người tiêu dùng BRW2",
     # "4": "Bán cho người tiêu dùng BRW1",
-    ".": "Bán cho người tiêu dùng BRW2",
+    ".": "Bán cho người tiêu dùng BRW1",
 
     
 }
 
 # Mặc định nếu không khớp tiền tố nào
+
 BUYER_NAME_DEFAULT = "Bán cho người tiêu dùng"
 
 # Danh sách tiền tố cần xử lý (theo thứ tự)

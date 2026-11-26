@@ -32,6 +32,7 @@ def check_current_bank_info(store_uid):
         page.goto(target_url)
         
         try:
+            page.wait_for_timeout(1000)
             page.wait_for_selector("input[placeholder='Nhập số tài khoản']", timeout=10000)
             
             # current_bank_name = page.locator(".text-selected p.text-link-blue b").inner_text()
@@ -61,6 +62,7 @@ def run_fabi_agent_with_session(store_uid, new_bank_acc, new_acc_name="DO TUAN B
         page.goto(target_url)
         
         try:
+            page.wait_for_timeout(1000)
             page.wait_for_selector("input[placeholder='Nhập số tài khoản']", timeout=10000)
             
             stk_field = page.locator("input[placeholder='Nhập số tài khoản']")

@@ -21,19 +21,20 @@ def auto_login_and_save_session():
 
     with sync_playwright() as p:
         logger.log(f"Agent khởi động trình duyệt để tự động đăng nhập tài khoản: {USER}...", "info")
-        browser = p.chromium.launch(headless=True)
+        browser = p.chromium.launch(headless=False)
         context = browser.new_context()
         page = context.new_page()
         
         page.goto("https://fabi.ipos.vn/login")
         
         try:
-            page.wait_for_selector("input[name='email_input']", timeout=10000)
-            page.locator("input[name='email_input']").fill(USER)
-            page.locator("input[type='password']").fill(PASSWORD)
+            page.wait_for_selector("input[id='login_email']", timeout=10000)
+            page.locator("input[id='login_email']").fill(USER)
+            page.locator("input[id='login_password']").fill(PASSWORD)
             
             logger.log("Đang nhấn nút Đăng nhập hệ thống...", "info")
-            page.locator("button[type='submit']").click()
+            page.locator("button[data-ic='reject']").click()
+            page.locator("button[aria-label='Đăng nhập']").click()
             
             page.wait_for_url("**/dashboard**", timeout=10000)
             logger.log("Đăng nhập thành công vào hệ thống quản trị iPOS!", "success")
@@ -64,3 +65,13 @@ def ensure_valid_session(force_refresh=False):
         return auto_login_and_save_session()
         
     return True
+
+
+if __name__ == "__main__":
+    print("Testing login and saving session...")
+    ok = auto_login_and_save_session()
+    print("Login result:", ok)
+
+    print("Testing ensure_valid_session(force_refresh=True)...")
+    valid = ensure_valid_session(force_refresh=True)
+    print("Session valid:", valid)

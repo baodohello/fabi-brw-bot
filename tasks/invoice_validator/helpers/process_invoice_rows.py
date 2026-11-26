@@ -21,11 +21,12 @@ def process_invoice_rows(
     processed_count = 0
 
     try:
-        page.wait_for_timeout(1000)
 
-        page.wait_for_selector(selectors.TABLE_TBODY_ROWS, timeout=3000)
+        page.wait_for_selector(selectors.TABLE_TBODY_ROWS, timeout=15000)
 
         while True:
+            page.wait_for_timeout(1000)
+
             rows = page.locator(selectors.TABLE_TBODY_ROWS).all()
             if not rows:
                 print("✅ Không còn hóa đơn nào để xử lý.", "success")
