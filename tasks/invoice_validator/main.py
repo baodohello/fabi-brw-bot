@@ -18,7 +18,7 @@ from tasks.invoice_validator.helpers.auth import (
 from tasks.invoice_validator.helpers import select_filter, process_invoice_rows
 from config.invoice_validator import BUYER_PREFIXES
 
-logger = DiscordLogger()
+logger = DiscordLogger( webhook_url=os.getenv("DISCORD_WEBHOOK_URL_MEINVOICE_VALIDATOR"))
 
 
 def run_invoice_validator_task() -> bool:

@@ -2,8 +2,7 @@ import time
 import schedule
 
 # Import hàm xử lý chính từ package tasks
-from tasks.bank_switcher import job_run_sync
-from tasks.vat_sync import run_vat_sync_report_task
+from tasks.bank_switcher import run_bank_switcher
 from config import VN_TZ
 from modules.discord_logger import DiscordLogger
 
@@ -23,20 +22,17 @@ if __name__ == "__main__":
         "18:00", "18:30" #hqua chua xuat
         ]
     for t in times:
-        schedule.every().monday.at(t).do(job_run_sync)
-        schedule.every().tuesday.at(t).do(job_run_sync)
-        schedule.every().wednesday.at(t).do(job_run_sync)
-        schedule.every().thursday.at(t).do(job_run_sync)
-        schedule.every().friday.at(t).do(job_run_sync)
+        schedule.every().monday.at(t).do(run_bank_switcher)
+        schedule.every().tuesday.at(t).do(run_bank_switcher)
+        schedule.every().wednesday.at(t).do(run_bank_switcher)
+        schedule.every().thursday.at(t).do(run_bank_switcher)
+        schedule.every().friday.at(t).do(run_bank_switcher)
 
 
-    # schedule.every().day.at("13:00").do(run_vat_sync_report_task)
-    # schedule.every().day.at("20:00").do(run_vat_sync_report_task)
 
     
     # 💡 Mẹo: Bỏ dấu '#' dòng dưới nếu muốn vừa bật file lên là bot chạy quét thử luôn
-    job_run_sync()
-    # run_vat_sync_report_task()
+    run_bank_switcher()
 
     print("⏳ Đang chạy ngầm, hệ thống sẽ tự nổ máy khi đến khung giờ hẹn...")
     

@@ -6,8 +6,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class DiscordLogger:
-    def __init__(self):
-        self.webhook_url = os.getenv("DISCORD_WEBHOOK_URL")
+    def __init__(self,webhook_url=None):
+        self.webhook_url = webhook_url or os.getenv("DISCORD_WEBHOOK_URL")
         # Định nghĩa bảng màu trực quan cho từng trạng thái
         self.colors = {
             "info": 3447003,     # Xanh lam

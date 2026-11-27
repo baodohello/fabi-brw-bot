@@ -7,16 +7,16 @@ from modules.discord_logger import DiscordLogger
 
 load_dotenv()
 
-USER = os.getenv("FABI_USERNAME", "brwcoffee2021@gmail.com")
+USER = os.getenv("FABI_USERNAME")
 PASSWORD = os.getenv("FABI_PASSWORD")
 SESSION_FILE = "fabi_auth_state.json"
 
 logger = DiscordLogger()
 
-def auto_login_and_save_session():
+def auto_login_and_save_session(close_browser=True):
     """Hàm tự động điền tài khoản từ .env để đăng nhập và đóng gói session."""
-    if not PASSWORD:
-        logger.log("Chưa cấu hình FABI_PASSWORD trong file .env!", "error")
+    if not PASSWORD or not USER:
+        logger.log("Thiếu thông tin đăng nhập trong file .env!", "error")
         return False
 
     with sync_playwright() as p:
@@ -41,8 +41,11 @@ def auto_login_and_save_session():
             
             context.storage_state(path=SESSION_FILE)
             logger.log(f"Đã đóng gói và lưu phiên làm việc mới vào '{SESSION_FILE}'", "success")
-            browser.close()
-            return True
+            if close_browser: 
+                browser.close()
+                return True
+            else:
+                return page  # Trả về page để tiếp tục thao tác nếu cần
         except Exception as e:
             logger.log(f"Tự động đăng nhập thất bại hoặc sai thông tin: {str(e)}", "error")
             browser.close()
