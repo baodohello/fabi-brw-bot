@@ -30,7 +30,7 @@ DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
 
 ```bash
 # Chạy scheduler 24/7 (tự động đổi ca + VAT sync)
-python main.py
+python -m tasks.bank_switcher
 
 # Chạy riêng tác vụ VAT Sync
 python -m tasks.vat_sync.main_task

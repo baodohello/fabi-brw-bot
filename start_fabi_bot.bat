@@ -3,4 +3,4 @@
 cd /d "C:\Users\ADMIN\Documents\fabi-brw-bot"
 
 :: Kích hoạt venv và chạy ẩn bằng pythonw
-start /b "" ".\venv\Scripts\pythonw.exe" main.py
+start /b "" ".\venv\Scripts\pythonw.exe" -m tasks.bank_switcher
