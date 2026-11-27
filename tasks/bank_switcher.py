@@ -65,7 +65,6 @@ def bank_check_or_update(store_uid, update = False, new_bank_acc=None, new_acc_n
 
 def run_bank_switcher():
     """Hàm chạy đồng bộ tác vụ Bank Switcher theo khung giờ."""
-    ensure_valid_session(force_refresh=True)  # Kiểm tra session trước khi chạy
 
     now_vn = datetime.now(VN_TZ)
     now_str = now_vn.strftime("%H:%M")
@@ -88,6 +87,8 @@ def run_bank_switcher():
 
     # Duyệt qua từng cửa hàng trong cấu hình BANK_SCHEDULE
     for store_name, store_data in BANK_SCHEDULE.items():
+        ensure_valid_session(force_refresh=True)  # Kiểm tra session trước khi chạy
+
         logger.log(f"\n=================== 🏪 {store_name.upper()} ===================", "info")
         STORE_UID = store_data["uid"]
         account_target = store_data["schedule"][selected_slot]
@@ -107,6 +108,7 @@ def run_bank_switcher():
 
             # Nếu khác thì tiến hành cập nhật
             else:
+
                 logger.log("🔄 Kết quả: Số tài khoản lệch pha! Kích hoạt Agent ghi đè dữ liệu...", "warning")
                 update_success = bank_check_or_update(STORE_UID, update=True, new_bank_acc=STK_MUC_TIEU, new_acc_name=TEN_MUC_TIEU)
                 if update_success:
@@ -162,7 +164,7 @@ if __name__ == "__main__":
 
     
     # 💡 Mẹo: Bỏ dấu '#' dòng dưới nếu muốn vừa bật file lên là bot chạy quét thử luôn
-    # run_bank_switcher()
+    run_bank_switcher()
 
     print("⏳ Đang chạy ngầm, hệ thống sẽ tự nổ máy khi đến khung giờ hẹn...")
     
