@@ -29,7 +29,7 @@ def bank_check_or_update(store_uid, update = False, new_bank_acc=None, new_acc_n
     """Dùng lại session đã lưu để cập nhật thông tin."""
     with sync_playwright() as p:
         logger.log(f"Agent khởi động trình duyệt bằng phiên đăng nhập để tiến hành {update and 'UPDATE' or 'CHECK'} ...", "info")
-        browser = p.chromium.launch(headless=False)
+        browser = p.chromium.launch(headless=True)
         context = browser.new_context(storage_state=SESSION_FILE)
         page = context.new_page()
         page.goto(STORE_URL.format(store_uid=store_uid))
@@ -96,42 +96,25 @@ def run_bank_switcher():
         TEN_MUC_TIEU = account_target["ten"]
 
         logger.log(f"🎯 Tài khoản cần cài đặt: ***{STK_MUC_TIEU[-4:]} (***{TEN_MUC_TIEU[-4:]})", "info")
+        update_success = bank_check_or_update(STORE_UID, update=True, new_bank_acc=STK_MUC_TIEU, new_acc_name=TEN_MUC_TIEU)
+        if update_success:
+            logger.log("🕵️ Tiến hành HẬU KIỂM độc lập sau khi Lưu...", "info")
+            info_sau = bank_check_or_update(STORE_UID, update=False)
 
-        info_truoc = None
-        info_truoc = bank_check_or_update(STORE_UID, update=False)
-
-        if info_truoc and isinstance(info_truoc, dict):
-            logger.log(f"Số TK hiện tại trên iPOS: ***{info_truoc['bank_acc'][-4:]} (***{info_truoc['bank_acc_name'][-4:]})", "info")
-            # So sánh với số tài khoản mục tiêu, nếu khác thì tiến hành cập nhật
-            if info_truoc["bank_acc"] == STK_MUC_TIEU and info_truoc["bank_acc_name"] == TEN_MUC_TIEU:
-                logger.log(f"✅ Kết quả: {store_name} đã đúng số tài khoản. Bỏ qua bước cập nhật.", "success")
-
-            # Nếu khác thì tiến hành cập nhật
-            else:
-
-                logger.log("🔄 Kết quả: Số tài khoản lệch pha! Kích hoạt Agent ghi đè dữ liệu...", "warning")
-                update_success = bank_check_or_update(STORE_UID, update=True, new_bank_acc=STK_MUC_TIEU, new_acc_name=TEN_MUC_TIEU)
-                if update_success:
-                    logger.log("🕵️ Tiến hành HẬU KIỂM độc lập sau khi Lưu...", "info")
-                    info_sau = bank_check_or_update(STORE_UID, update=False)
-
-                    if info_sau and isinstance(info_sau, dict):
-                        summary_msg = (
-                            f"📊 **BÁO CÁO CẬP NHẬT: {store_name}**\n"
-                            f"• Mốc giờ: `{selected_slot}`\n"
-                            f"• Trước khi chạy: `**{info_truoc['bank_acc'][-4:]} (***{info_truoc['bank_acc_name'][-4:]})`\n"
-                            f"• Thực tế hiện tại: `**{info_sau['bank_acc'][-4:]} (***{info_sau['bank_acc_name'][-4:]})`\n"
-                        )
-                        if info_sau["bank_acc"] == STK_MUC_TIEU:
-                            logger.log(f"🎉 Xác thực: Đổi số TK cho {store_name} THÀNH CÔNG!", "success")
-                            logger.log(summary_msg + "\n\n🟢 **TRẠNG THÁI: HOÀN THÀNH**", "success")
-                        else:
-                            logger.log(f"❌ Xác thực: Thao tác Lưu cho {store_name} thất bại!", "error")
-                            logger.log(summary_msg + "\n\n🔴 **TRẠNG THÁI: LỖI ĐỒNG BỘ**", "error")
+            if info_sau and isinstance(info_sau, dict):
+                summary_msg = (
+                    f"📊 **BÁO CÁO CẬP NHẬT: {store_name}**\n"
+                    f"• Mốc giờ: `{selected_slot}`\n"
+                    f"• Thực tế hiện tại: `**{info_sau['bank_acc'][-4:]} (***{info_sau['bank_acc_name'][-4:]})`\n"
+                )
+                if info_sau["bank_acc"] == STK_MUC_TIEU:
+                    logger.log(f"🎉 Xác thực: Đổi số TK cho {store_name} THÀNH CÔNG!", "success")
+                    logger.log(summary_msg + "\n\n🟢 **TRẠNG THÁI: HOÀN THÀNH**", "success")
                 else:
-                    logger.log(f"❌ Gặp lỗi trong luồng điền form của {store_name}.", "error")
+                    logger.log(f"❌ Xác thực: Thao tác Lưu cho {store_name} thất bại!", "error")
+                    logger.log(summary_msg + "\n\n🔴 **TRẠNG THÁI: LỖI ĐỒNG BỘ**", "error")
         else:
-            logger.log(f"❌ Bỏ qua {store_name} do không lấy được dữ liệu hiện tại.", "error")
+            logger.log(f"❌ Gặp lỗi trong luồng điền form của {store_name}.", "error")
             
         time.sleep(STORE_DELAY_SEC)
 
@@ -139,9 +122,9 @@ def run_bank_switcher():
 
 
 
-
+    
 if __name__ == "__main__":
-    logger.log("🤖 FABI BRW Bot đã khởi động chế độ trực chiến 24/7...", "info")
+    logger.log("🤖 FABI BANK SWITCHER đã khởi động chế độ trực chiến 24/7...", "info")
 
     # 🌟 Đăng ký các mốc giờ đổi ca của quán tại đây (Dễ dàng thêm/bớt ca)
     # Mỗi schedule.every() tạo 1 Job MỚI — gọi riêng để tránh .at() ghi đè lẫn nhau
@@ -160,11 +143,9 @@ if __name__ == "__main__":
         schedule.every().thursday.at(t).do(run_bank_switcher)
         schedule.every().friday.at(t).do(run_bank_switcher)
 
-
-
     
     # 💡 Mẹo: Bỏ dấu '#' dòng dưới nếu muốn vừa bật file lên là bot chạy quét thử luôn
-    run_bank_switcher()
+    # run_bank_switcher()
 
     print("⏳ Đang chạy ngầm, hệ thống sẽ tự nổ máy khi đến khung giờ hẹn...")
     
