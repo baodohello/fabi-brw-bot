@@ -32,6 +32,9 @@ DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/...
 # Chạy scheduler 24/7 (tự động đổi ca + VAT sync)
 python -m tasks.bank_switcher
 
+python -m tasks.fabi_export_4_report
+
+
 # Chạy riêng tác vụ VAT Sync
 python -m tasks.vat_sync.main_task
 

@@ -52,11 +52,13 @@ def process_invoice_rows(
                 # Lưu hóa đơn
                 print(f"  💾 Đang lưu hóa đơn {invoice_code}...", "info")
                 save_btn = page.locator(selectors.BTN_SAVE)
+                save_btn.wait_for(state="visible", timeout=10000)
                 save_btn.click()
                 page.wait_for_timeout(1000)
 
                 # Bấm "Có" trên popup xác nhận (nếu có)
                 popup_btn = page.locator(selectors.POPUP_CONFIRM_BTN_CO)
+                popup_btn.wait_for(state="visible", timeout=10000)
                 if popup_btn.count() > 0:
                     popup_btn.click()
                     print(f"  ✅ Đã bấm 'Có' trên popup xác nhận.", "success")

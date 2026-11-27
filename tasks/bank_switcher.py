@@ -133,8 +133,8 @@ if __name__ == "__main__":
         "09:00", "11:30", 
         "12:00", "12:15",
         "13:30", "16:00",
-        "17:00", "17:30",#hqua chua xuat
-        "18:00", "18:30" #hqua chua xuat
+        "17:00", "17:15",#hqua chua xuat
+        "18:00", "18:15" #hqua chua xuat
         ]
     for t in times:
         schedule.every().monday.at(t).do(run_bank_switcher)
