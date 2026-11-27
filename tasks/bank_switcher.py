@@ -32,14 +32,18 @@ def bank_check_or_update(store_uid, update = False, new_bank_acc=None, new_acc_n
         context = browser.new_context(storage_state=SESSION_FILE)
         page = context.new_page()
         page.goto(STORE_URL.format(store_uid=store_uid))
+
+        # Thử khởi chạy và kiểm tra form VietQr
         try:
             page.wait_for_timeout(1000)
-            page.wait_for_selector(SEL_ACC, timeout=10000) 
+            page.wait_for_selector(SEL_ACC, timeout=30000) 
             if not update:
-                return {
-                    "bank_acc": page.locator(SEL_ACC).input_value(),
-                    "bank_acc_name": page.locator(SEL_NAME).input_value(),
+                info = {
+                    "bank_acc": page.locator(SEL_ACC).input_value(),    
+                "bank_acc_name": page.locator(SEL_NAME).input_value(),
                 }
+                browser.close()
+                return info
             for selector, value in ((SEL_ACC, new_bank_acc), (SEL_NAME, new_acc_name)):
                     field = page.locator(selector)
                     if value is None:
@@ -50,13 +54,13 @@ def bank_check_or_update(store_uid, update = False, new_bank_acc=None, new_acc_n
             page.wait_for_timeout(1000)
             page.locator(SEL_SAVE).click() # Click nút Lưu
             page.wait_for_timeout(4000)
+            browser.close()
             return True
         except Exception as e:
             browser.close()
+            print(f"⚠️ Lỗi khi kiểm tra/cập nhật số tài khoản cho cửa hàng {store_uid}: {e}")
             logger.log(f"Phiên làm việc có thể đã hết hạn hoặc không tải được form VietQr.", "warning")
             return False
-        finally:
-            browser.close()
 
 def run_bank_switcher():
     """Hàm chạy đồng bộ tác vụ Bank Switcher theo khung giờ."""
@@ -89,13 +93,13 @@ def run_bank_switcher():
         STK_MUC_TIEU = account_target["stk"]
         TEN_MUC_TIEU = account_target["ten"]
 
-        logger.log(f"🎯 Tài khoản cần cài đặt: ********{STK_MUC_TIEU[-4:]} ({TEN_MUC_TIEU})", "info")
+        logger.log(f"🎯 Tài khoản cần cài đặt: ***{STK_MUC_TIEU[-4:]} (***{TEN_MUC_TIEU[-4:]})", "info")
 
         info_truoc = None
         info_truoc = bank_check_or_update(STORE_UID, update=False)
 
         if info_truoc and isinstance(info_truoc, dict):
-            logger.log(f"Số TK hiện tại trên iPOS: ********{info_truoc['bank_acc'][-4:]} ({info_truoc['bank_acc_name']})", "info")
+            logger.log(f"Số TK hiện tại trên iPOS: ***{info_truoc['bank_acc'][-4:]} (***{info_truoc['bank_acc_name'][-4:]})", "info")
             # So sánh với số tài khoản mục tiêu, nếu khác thì tiến hành cập nhật
             if info_truoc["bank_acc"] == STK_MUC_TIEU and info_truoc["bank_acc_name"] == TEN_MUC_TIEU:
                 logger.log(f"✅ Kết quả: {store_name} đã đúng số tài khoản. Bỏ qua bước cập nhật.", "success")
@@ -112,9 +116,8 @@ def run_bank_switcher():
                         summary_msg = (
                             f"📊 **BÁO CÁO CẬP NHẬT: {store_name}**\n"
                             f"• Mốc giờ: `{selected_slot}`\n"
-                            f"• Trước khi chạy: `********{info_truoc['bank_acc'][-4:]}`\n"
-                            f"• Thực tế hiện tại: `********{info_sau['bank_acc'][-4:]}`\n"
-                            f"• Chủ tài khoản: `{info_sau['bank_acc_name']}`"
+                            f"• Trước khi chạy: `**{info_truoc['bank_acc'][-4:]} (***{info_truoc['bank_acc_name'][-4:]})`\n"
+                            f"• Thực tế hiện tại: `**{info_sau['bank_acc'][-4:]} (***{info_sau['bank_acc_name'][-4:]})`\n"
                         )
                         if info_sau["bank_acc"] == STK_MUC_TIEU:
                             logger.log(f"🎉 Xác thực: Đổi số TK cho {store_name} THÀNH CÔNG!", "success")
